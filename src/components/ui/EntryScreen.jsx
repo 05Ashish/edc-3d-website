@@ -117,7 +117,7 @@ const EntryContainer = styled.div`
   overflow: hidden;
   font-family: 'Cyberpunk', sans-serif;
   transition: opacity 0.5s ease;
-  opacity: ${props => props.fading ? 0 : 1};
+  opacity: ${props => props.$fading ? 0 : 1};
   
   &::before {
     content: '';
@@ -374,7 +374,7 @@ const EntryScreen = ({ onEnter }) => {
   return (
     <>
       <GlobalStyle />
-      <EntryContainer fading={isTransitioning}>
+      <EntryContainer $fading={isTransitioning}>
         <MatrixRain />
         <Title>
           EDC MAIT

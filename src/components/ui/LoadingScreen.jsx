@@ -159,8 +159,8 @@ const GlitchText = styled(motion.div)`
 `
 
 const loadingAudio = new Howl({
-  src: ['public/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'], // Replace with the any audio path which you like
-  volume: 0.8,
+  src: ['/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'], // Replace with the any audio path which you like
+  volume: 1,
 });
 
 const LightsaberContainer = styled.div`
@@ -234,10 +234,10 @@ const SaberBlade = styled(motion.div)`
 `
 
 const GlitchText2 = styled(motion.div)`
-  color: #00B4D8;
+  color:rgb(0, 216, 126);
   font-size: 1rem;
   opacity: 0.8;
-  text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
+  text-shadow: 2px 2pxrgb(255, 94, 0), -2px -2pxrgb(98, 0, 255);
   animation: ${flicker} 3s linear infinite;
 `
 

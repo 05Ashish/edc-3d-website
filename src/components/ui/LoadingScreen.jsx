@@ -160,7 +160,7 @@ const GlitchText = styled(motion.div)`
 
 // Initialize audio with html5: true to prevent AudioContext issues
 const loadingAudio = new Howl({
-  src: ['/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'],
+  src: ['src/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'],
   volume: 1,
   html5: true,
   preload: false,

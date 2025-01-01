@@ -59,7 +59,7 @@ const Container = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #0078D7;
+  background:rgb(215, 0, 0);
   color: white;
   font-family: "Segoe UI", monospace;
   z-index: 9999;

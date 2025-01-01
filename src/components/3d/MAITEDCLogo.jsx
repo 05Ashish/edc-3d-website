@@ -11,7 +11,7 @@ const MAITEDCLogo = ({ position = [0, 0, 0], scale = 1 }) => {
   }))
 
   // Load font
-  const font = useFont('/fonts/helvetiker_bold.typeface.json')
+  const font = useFont('src/assets/fonts/helvetiker_bold.typeface.json')
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime()

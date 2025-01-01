@@ -131,7 +131,7 @@ const BSODTransition = ({ onTransitionEnd }) => {
   useEffect(() => {
     const progressInterval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
+        if (prev >= 0) {
           clearInterval(progressInterval);
           setTimeout(() => onTransitionEnd(), 500);
           return 100;

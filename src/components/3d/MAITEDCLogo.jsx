@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Text3D, Float } from '@react-three/drei'
+import { Text3D, Float, useFont } from '@react-three/drei'
 import { useSpring, animated } from '@react-spring/three'
 
 const MAITEDCLogo = ({ position = [0, 0, 0], scale = 1 }) => {
@@ -10,10 +10,17 @@ const MAITEDCLogo = ({ position = [0, 0, 0], scale = 1 }) => {
     config: { mass: 1, tension: 280, friction: 60 }
   }))
 
+  // Load font
+  const font = useFont('/fonts/helvetiker_bold.typeface.json')
+
   useFrame((state) => {
     const time = state.clock.getElapsedTime()
-    groupRef.current.position.y = Math.sin(time * 0.5) * 0.1
+    if (groupRef.current) {
+      groupRef.current.position.y = Math.sin(time * 0.5) * 0.1
+    }
   })
+
+  if (!font) return null // Don't render until font is loaded
 
   return (
     <Float
@@ -28,7 +35,7 @@ const MAITEDCLogo = ({ position = [0, 0, 0], scale = 1 }) => {
       >
         {/* EDC Text */}
         <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
+          font={font}
           size={1.5}
           height={0.2}
           curveSegments={12}
@@ -51,7 +58,7 @@ const MAITEDCLogo = ({ position = [0, 0, 0], scale = 1 }) => {
 
         {/* MAIT Text */}
         <Text3D
-          font="/fonts/helvetiker_bold.typeface.json"
+          font={font}
           size={0.5}
           height={0.1}
           curveSegments={12}

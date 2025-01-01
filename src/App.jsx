@@ -19,10 +19,12 @@ const AppContainer = styled.div`
 function App() {
   const [showEntryScreen, setShowEntryScreen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showExperience, setShowExperience] = useState(false);
 
   useEffect(() => {
     const handleLoadingComplete = () => {
       setIsLoading(false);
+      setShowExperience(true);
     };
 
     window.addEventListener('loadingComplete', handleLoadingComplete);
@@ -38,22 +40,24 @@ function App() {
     <AppContainer>
       {showEntryScreen && <EntryScreen onEnter={handleEnter} />}
       {isLoading && <LoadingScreen />}
-      <div style={{ visibility: isLoading || showEntryScreen ? 'hidden' : 'visible', height: '100%' }}>
-        <Canvas
-          camera={{ position: [0, 0, 5], fov: 75 }}
-          dpr={[1, 2]}
-          gl={{
-            antialias: true,
-            alpha: false,
-            powerPreference: 'high-performance',
-          }}
-        >
-          <Suspense fallback={null}>
-            <Experience />
-          </Suspense>
-        </Canvas>
-      </div>
-      <Loader />
+      {showExperience && (
+        <div style={{ width: '100%', height: '100%' }}>
+          <Canvas
+            camera={{ position: [0, 0, 5], fov: 75 }}
+            dpr={[1, 2]}
+            gl={{
+              antialias: true,
+              alpha: false,
+              powerPreference: 'high-performance',
+            }}
+          >
+            <Suspense fallback={null}>
+              <Experience />
+            </Suspense>
+          </Canvas>
+          <Loader />
+        </div>
+      )}
     </AppContainer>
   );
 }

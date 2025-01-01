@@ -20,7 +20,7 @@ const MAITEDCLogo = ({ position = [0, 0, 0], scale = 1 }) => {
     }
   })
 
- // if (!font) return null // Don't render until font is loaded
+  if (!font) return null // Don't render until font is loaded
 
   return (
     <Float

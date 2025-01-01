@@ -100,24 +100,28 @@ const ErrorMessage = styled.div`
   animation: ${flicker} 2s infinite;
 `;
 
-const ProgressBar = styled.div`
-  width: 50%;
-  height: 30px;
-  background: #004b87;
-  margin-top: 2rem;
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: ${props => props.progress}%;
-    background: #00ff00;
-    transition: width 0.2s ease;
-  }
+const ProgressBar = styled.div.attrs(props => ({
+    style: {
+      '--progress': `${props.$progress}%`
+    }
+  }))`
+    width: 50%;
+    height: 30px;
+    background: #004b87;
+    margin-top: 2rem;
+    position: relative;
+    overflow: hidden;
+  
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: var(--progress);
+      background: #00ff00;
+      transition: width 0.2s ease;
+    }
 `;
 
 const BSODTransition = ({ onTransitionEnd }) => {
@@ -155,7 +159,7 @@ const BSODTransition = ({ onTransitionEnd }) => {
       <ErrorMessage>IRQL_NOT_LESS_OR_EQUAL</ErrorMessage>
       <ErrorMessage>ATTEMPTING_EMERGENCY_OVERRIDE...</ErrorMessage>
       <ErrorMessage>BYPASSING_SECURITY_PROTOCOLS...</ErrorMessage>
-      <ProgressBar progress={progress} />
+      <ProgressBar $progress={progress} />
       <ErrorMessage>System Recovery: {progress}% Complete</ErrorMessage>
     </Container>
   );

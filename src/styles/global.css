@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Cyberpunk';
-    src: url('/assets/fonts/cyberpunk.woff') format('woff');
+    src: url('src/assets/fonts/cyberpunk.woff') format('woff');
     font-weight: normal;
     font-style: normal;
   }

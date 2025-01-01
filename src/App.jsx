@@ -6,6 +6,8 @@ import { Loader } from '@react-three/drei';
 import LoadingScreen from './components/ui/LoadingScreen';
 import Experience from './components/Experience';
 import EntryScreen from './components/ui/EntryScreen';
+import BSODTransition from './components/ui/BSODTransition';
+import { useAudioManager } from './systems/AudioManager';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -17,31 +19,49 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  const [showEntryScreen, setShowEntryScreen] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showExperience, setShowExperience] = useState(false);
+  const [screen, setScreen] = useState('entry');
+  const audioManager = useAudioManager();
 
-  useEffect(() => {
-    const handleLoadingComplete = () => {
-      setIsLoading(false);
-      setShowExperience(true);
-    };
+  const handleEntryClick = () => {
+    // Only handle click, EntryScreen will handle its own fade out
+    audioManager.playSound('transition');
+    setScreen('bsod');
+  };
 
-    window.addEventListener('loadingComplete', handleLoadingComplete);
-    return () => window.removeEventListener('loadingComplete', handleLoadingComplete);
-  }, []);
+  const handleBSODComplete = () => {
+    audioManager.playSound('transition');
+    setScreen('loading');
+  };
 
-  const handleEnter = () => {
-    setShowEntryScreen(false);
-    setIsLoading(true);
+  const handleLoadingComplete = () => {
+    audioManager.initAudio();
+    setScreen('experience');
   };
 
   return (
     <AppContainer>
-      {showEntryScreen && <EntryScreen onEnter={handleEnter} />}
-      {isLoading && <LoadingScreen />}
-      {showExperience && (
-        <div style={{ width: '100%', height: '100%' }}>
+      {screen === 'entry' && (
+        <EntryScreen 
+          onEnter={handleEntryClick} 
+          // Remove any transition logic from EntryScreen props
+        />
+      )}
+      
+      {screen === 'bsod' && (
+        <BSODTransition 
+          onTransitionEnd={handleBSODComplete}
+          // Pass as a simple callback
+        />
+      )}
+      
+      {screen === 'loading' && (
+        <LoadingScreen 
+          onComplete={handleLoadingComplete}
+        />
+      )}
+      
+      {screen === 'experience' && (
+        <>
           <Canvas
             camera={{ position: [0, 0, 5], fov: 75 }}
             dpr={[1, 2]}
@@ -56,7 +76,7 @@ function App() {
             </Suspense>
           </Canvas>
           <Loader />
-        </div>
+        </>
       )}
     </AppContainer>
   );

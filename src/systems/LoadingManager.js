@@ -33,7 +33,7 @@ class AssetLoader {
 
     // Asset manifests
     this.textures = {
-      'environment': '/assets/textures/environment.jpg'
+      'environment': 'src/assets/textures/environment.jpg'
     }
     
     this.models = {

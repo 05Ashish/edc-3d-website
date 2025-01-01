@@ -71,7 +71,7 @@ export function useInteractive(ref, {
 }
 
 export function EventSystem({ children }) {
-  const { camera, raycaster, mouse } = useThree()
+  const { camera, raycaster } = useThree()
   const setHovered = useEventStore((state) => state.setHovered)
   const setSelected = useEventStore((state) => state.setSelected)
   const interactiveObjects = useEventStore((state) => state.interactiveObjects)

@@ -74,7 +74,7 @@ const screenShake = keyframes`
 const GlobalStyle = createGlobalStyle`
   @font-face {
     font-family: 'Cyberpunk';
-    src: url('/fonts/Cyberpunk.woff') format('woff');
+    src: url('src/assets/fonts/cyberpunk.woff') format('woff');
   }
 `;
 

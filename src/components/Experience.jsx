@@ -1,39 +1,40 @@
-import React, { useState, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import { Environment, Stars } from '@react-three/drei'
-import MAITEDCLogo from './3d/MAITEDCLogo'
-import ParticleSystem from './effects/ParticleSystem'
-import PortalEffect from './effects/PortalEffect'
-import AboutSection from './sections/AboutSection'
-import EventsSection from './sections/EventsSection'
-import GallerySection from './sections/GallerySection'
-import TeamSection from './sections/TeamSection'
-import { useAudioManager } from '../systems/AudioManager'
+import React, { useState, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Environment, Stars } from '@react-three/drei';
+import MAITEDCLogo from './3d/MAITEDCLogo';
+import ParticleSystem from './effects/ParticleSystem';
+import PortalEffect from './effects/PortalEffect';
+import AboutSection from './sections/AboutSection';
+import EventsSection from './sections/EventsSection';
+import GallerySection from './sections/GallerySection';
+import TeamSection from './sections/TeamSection';
+import { useAudioManager } from '../systems/AudioManager';
+import Cursor from './ui/Cursor'; // Import Cursor component
 
 const SECTIONS = {
   HOME: 'home',
   ABOUT: 'about',
   EVENTS: 'events',
   GALLERY: 'gallery',
-  TEAM: 'team'
-}
+  TEAM: 'team',
+};
 
 const Experience = () => {
-  const [activeSection, setActiveSection] = useState(SECTIONS.HOME)
-  const mainGroupRef = useRef()
-  const { playSound } = useAudioManager()
+  const [activeSection, setActiveSection] = useState(SECTIONS.HOME);
+  const mainGroupRef = useRef();
+  const { playSound } = useAudioManager();
 
   useFrame((state) => {
-    const time = state.clock.getElapsedTime()
-    mainGroupRef.current.position.y = Math.sin(time * 0.5) * 0.2
-  })
+    const time = state.clock.getElapsedTime();
+    mainGroupRef.current.position.y = Math.sin(time * 0.5) * 0.2;
+  });
 
   const handleSectionChange = (section) => {
     if (section !== activeSection) {
-      playSound('transition')
-      setActiveSection(section)
+      playSound('transition');
+      setActiveSection(section);
     }
-  }
+  };
 
   return (
     <>
@@ -84,8 +85,11 @@ const Experience = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />
       <pointLight position={[-10, -10, -10]} color="#00B4D8" intensity={0.5} />
-    </>
-  )
-}
 
-export default Experience
+      {/* Cursor */}
+      <Cursor /> {/* Add Cursor Component */}
+    </>
+  );
+};
+
+export default Experience;

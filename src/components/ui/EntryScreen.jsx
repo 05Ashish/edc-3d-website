@@ -1,6 +1,7 @@
 // EntryScreen.jsx
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
+import cyberpunkFont from '../../assets/fonts/cyberpunk.woff';
 
 const matrixRain = keyframes`
   0% { transform: translateY(-100%); }
@@ -74,7 +75,10 @@ const screenShake = keyframes`
 const GlobalStyle = createGlobalStyle`
   @font-face {
     font-family: 'Cyberpunk';
-    src: url('src/assets/fonts/cyberpunk.woff') format('woff');
+    src: url(${cyberpunkFont}) format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
   }
 `;
 

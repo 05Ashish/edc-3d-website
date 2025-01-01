@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -9,13 +9,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    port: 3000,
-    open: true
-  },
+  assetsInclude: ['**/*.woff', '**/*.woff2', '**/*.typeface.json'],
   build: {
-    outDir: 'dist',
     sourcemap: true,
-    chunkSizeWarningLimit: 1600,
-  }
-})
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
+    },
+  },
+});

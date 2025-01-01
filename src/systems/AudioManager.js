@@ -25,7 +25,7 @@ const useAudioStore = create((set, get) => ({
   isMuted: false,
   musicVolume: 0.3,
   effectsVolume: 0.5,
-  isPlaying: false,
+  isPlaying: true,
 
   initAudio: () => {
     const state = get()

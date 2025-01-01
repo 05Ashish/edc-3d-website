@@ -158,9 +158,12 @@ const GlitchText = styled(motion.div)`
   }
 `
 
+// Initialize audio with html5: true to prevent AudioContext issues
 const loadingAudio = new Howl({
-  src: ['/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'], // Replace with the any audio path which you like
+  src: ['/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'],
   volume: 1,
+  html5: true,
+  preload: false,
 });
 
 const LightsaberContainer = styled.div`
@@ -179,7 +182,7 @@ const SaberHandle = styled.div`
   border-radius: 4px;
   position: relative;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-  z-index: 10;  // Ensure handle appears above blade
+  z-index: 10;
 
   &::before {
     content: '';
@@ -204,8 +207,8 @@ const SaberBlade = styled(motion.div)`
               0 0 30px ${props => props.color},
               0 0 40px ${props => props.color};
   transform-origin: left center;
-  width: ${props => `${props.width}%`};  // Dynamically set the width based on progress
-  z-index: 5;  // Ensure blade is below the handle
+  width: ${props => `${props.width}%`};
+  z-index: 5;
 
   &::before {
     content: '';
@@ -234,10 +237,10 @@ const SaberBlade = styled(motion.div)`
 `
 
 const GlitchText2 = styled(motion.div)`
-  color:rgb(0, 216, 126);
+  color: #00B4D8;
   font-size: 1rem;
   opacity: 0.8;
-  text-shadow: 2px 2pxrgb(255, 94, 0), -2px -2pxrgb(98, 0, 255);
+  text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
   animation: ${flicker} 3s linear infinite;
 `
 
@@ -263,11 +266,18 @@ const LoadingScreen = () => {
   const [progress, setProgress] = useState(0)
   const [saberColor, setSaberColor] = useState(lightsaberColors[0])
   const [glitchText, setGlitchText] = useState('ERROR')
-  const [isVisible, setIsVisible] = useState(true)  // To handle hiding the screen after 6 seconds
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     const randomColor = lightsaberColors[Math.floor(Math.random() * lightsaberColors.length)]
     setSaberColor(randomColor)
+
+    // Try to play the loading audio
+    try {
+      loadingAudio.play();
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
 
     const texts = [
       'SYSTEM BREACH...',
@@ -293,34 +303,37 @@ const LoadingScreen = () => {
       })
     }, 50)
 
-    // Hide the loading screen after 6 seconds
     const timeout = setTimeout(() => {
       setIsVisible(false)
+      // Dispatch an event when loading is complete
+      window.dispatchEvent(new Event('loadingComplete'))
+      // Stop the audio when loading is complete
+      loadingAudio.stop();
     }, 6000)
 
     return () => {
       clearInterval(interval)
       clearInterval(textInterval)
       clearTimeout(timeout)
+      loadingAudio.stop();
     }
   }, [])
 
-  return (
-    isVisible && (
-      <LoadingContainer>
+  if (!isVisible) return null
 
-        <Scanline />
-        <GlitchText>EDC MAIT</GlitchText>
-        <LightsaberContainer>
-          <SaberHandle />
-          <SaberBlade
-            color={saberColor}
-            width={progress} // Pass progress as width for the blade
-          />
-        </LightsaberContainer>
-        <GlitchText2>{glitchText}</GlitchText2>
-      </LoadingContainer>
-    )
+  return (
+    <LoadingContainer>
+      <Scanline />
+      <GlitchText>EDC MAIT</GlitchText>
+      <LightsaberContainer>
+        <SaberHandle />
+        <SaberBlade
+          color={saberColor}
+          width={progress}
+        />
+      </LightsaberContainer>
+      <GlitchText2>{glitchText}</GlitchText2>
+    </LoadingContainer>
   )
 }
 

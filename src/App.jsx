@@ -1,10 +1,11 @@
-// src/App.jsx
-import React, { useState, Suspense } from 'react';
+// App.jsx
+import React, { useState, Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import styled from 'styled-components';
-import { Loader } from '@react-three/drei'; // Import Loader for better progress handling
+import { Loader } from '@react-three/drei';
 import LoadingScreen from './components/ui/LoadingScreen';
 import Experience from './components/Experience';
+import EntryScreen from './components/ui/EntryScreen';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -16,30 +17,43 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [showEntryScreen, setShowEntryScreen] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const handleLoadingComplete = () => {
+      setIsLoading(false);
+    };
+
+    window.addEventListener('loadingComplete', handleLoadingComplete);
+    return () => window.removeEventListener('loadingComplete', handleLoadingComplete);
+  }, []);
+
+  const handleEnter = () => {
+    setShowEntryScreen(false);
+    setIsLoading(true);
+  };
 
   return (
     <AppContainer>
-      {isLoading ? (
-        <LoadingScreen onFinish={() => setIsLoading(false)} /> // Pass a callback to LoadingScreen
-      ) : (
-        <>
-          <Canvas
-            camera={{ position: [0, 0, 5], fov: 75 }}
-            dpr={[1, 2]}
-            gl={{
-              antialias: true,
-              alpha: false,
-              powerPreference: 'high-performance',
-            }}
-          >
-            <Suspense fallback={<LoadingScreen />}>
-              <Experience />
-            </Suspense>
-          </Canvas>
-          <Loader /> {/* Provides loading feedback for assets */}
-        </>
-      )}
+      {showEntryScreen && <EntryScreen onEnter={handleEnter} />}
+      {isLoading && <LoadingScreen />}
+      <div style={{ visibility: isLoading || showEntryScreen ? 'hidden' : 'visible', height: '100%' }}>
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 75 }}
+          dpr={[1, 2]}
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: 'high-performance',
+          }}
+        >
+          <Suspense fallback={null}>
+            <Experience />
+          </Suspense>
+        </Canvas>
+      </div>
+      <Loader />
     </AppContainer>
   );
 }

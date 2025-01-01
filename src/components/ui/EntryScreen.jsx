@@ -195,7 +195,7 @@ const Title = styled.h1`
 
 const EntryButton = styled.button`
   background: transparent;
-  border: 2px solid #00B4D8;
+  border: 2px solidrgb(216, 0, 0);
   color: #00B4D8;
   padding: 1.5rem 3rem;
   font-size: 1.8rem;
@@ -381,7 +381,7 @@ const EntryScreen = ({ onEnter }) => {
       <EntryContainer $fading={isTransitioning}>
         <MatrixRain />
         <Title>
-          EDC MAIT
+          Order 66
           <span>{glitchText}</span>
         </Title>
         <EntryButton onClick={handleClick}>

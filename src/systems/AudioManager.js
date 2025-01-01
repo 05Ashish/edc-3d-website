@@ -1,119 +1,111 @@
-import { Howl } from 'howler';
+import { create } from 'zustand'
+import { Howl } from 'howler'
 
-class AudioManager {
-  constructor() {
-    this.sounds = {
-      background: new Howl({
-        src: ['/assets/sounds/background.mp3'],
-        loop: true,
-        volume: 0.3,
-        autoplay: false
-      }),
-      hover: new Howl({
-        src: ['/assets/sounds/hover.mp3'],
-        volume: 0.5
-      }),
-      click: new Howl({
-        src: ['/assets/sounds/click.mp3'],
-        volume: 0.5
-      }),
-      transition: new Howl({
-        src: ['/assets/sounds/transition.mp3'],
-        volume: 0.5
-      }),
-      portal: new Howl({
-        src: ['/assets/sounds/portal.mp3'],
-        volume: 0.5
-      })
-    };
+const sounds = {
+  background: new Howl({
+    src: ['/assets/sounds/background.mp3'],
+    loop: true,
+    volume: 0.3
+  }),
+  hover: new Howl({
+    src: ['/assets/sounds/hover.mp3'],
+    volume: 0.5
+  }),
+  click: new Howl({
+    src: ['/assets/sounds/click.mp3'],
+    volume: 0.5
+  }),
+  transition: new Howl({
+    src: ['/assets/sounds/transition.mp3'],
+    volume: 0.5
+  })
+}
 
-    this.isMuted = false;
-    this.backgroundVolume = 0.3;
-    this.effectsVolume = 0.5;
-  }
+const useAudioStore = create((set, get) => ({
+  isMuted: false,
+  musicVolume: 0.3,
+  effectsVolume: 0.5,
+  isPlaying: true,
 
-  playSound(soundName) {
-    if (!this.isMuted && this.sounds[soundName]) {
-      this.sounds[soundName].play();
+  initAudio: () => {
+    const state = get()
+    if (!state.isPlaying) {
+      sounds.background.play()
+      set({ isPlaying: true })
     }
-  }
+  },
 
-  stopSound(soundName) {
-    if (this.sounds[soundName]) {
-      this.sounds[soundName].stop();
+  toggleMute: () => {
+    const state = get()
+    const newMutedState = !state.isMuted
+    
+    Object.values(sounds).forEach(sound => {
+      sound.mute(newMutedState)
+    })
+    
+    set({ isMuted: newMutedState })
+  },
+
+  setMusicVolume: (volume) => {
+    sounds.background.volume(volume)
+    set({ musicVolume: volume })
+    localStorage.setItem('musicVolume', volume.toString())
+  },
+
+  setEffectsVolume: (volume) => {
+    ['hover', 'click', 'transition'].forEach(soundKey => {
+      sounds[soundKey].volume(volume)
+    })
+    set({ effectsVolume: volume })
+    localStorage.setItem('effectsVolume', volume.toString())
+  },
+
+  playSound: (soundName) => {
+    const state = get()
+    if (!state.isMuted && sounds[soundName]) {
+      sounds[soundName].play()
     }
-  }
+  },
 
-  startBackground() {
-    if (!this.isMuted) {
-      this.sounds.background.play();
-      this.fadeIn('background', 2000);
+  stopSound: (soundName) => {
+    if (sounds[soundName]) {
+      sounds[soundName].stop()
     }
-  }
+  },
 
-  stopBackground() {
-    this.fadeOut('background', 2000);
+  cleanup: () => {
+    Object.values(sounds).forEach(sound => {
+      sound.unload()
+    })
   }
+}))
 
-  fadeIn(soundName, duration) {
-    if (this.sounds[soundName]) {
-      const targetVolume = soundName === 'background' ? 
-        this.backgroundVolume : this.effectsVolume;
-      
-      this.sounds[soundName].fade(0, targetVolume, duration);
-    }
+// Initialize audio settings from localStorage
+if (typeof window !== 'undefined') {
+  const savedMusicVolume = localStorage.getItem('musicVolume')
+  const savedEffectsVolume = localStorage.getItem('effectsVolume')
+
+  if (savedMusicVolume) {
+    useAudioStore.getState().setMusicVolume(parseFloat(savedMusicVolume))
   }
-
-  fadeOut(soundName, duration) {
-    if (this.sounds[soundName]) {
-      const currentVolume = this.sounds[soundName].volume();
-      this.sounds[soundName].fade(currentVolume, 0, duration);
-    }
-  }
-
-  toggleMute() {
-    this.isMuted = !this.isMuted;
-    Object.values(this.sounds).forEach(sound => {
-      sound.mute(this.isMuted);
-    });
-  }
-
-  setBackgroundVolume(volume) {
-    this.backgroundVolume = volume;
-    this.sounds.background.volume(volume);
-  }
-
-  setEffectsVolume(volume) {
-    this.effectsVolume = volume;
-    Object.entries(this.sounds).forEach(([name, sound]) => {
-      if (name !== 'background') {
-        sound.volume(volume);
-      }
-    });
-  }
-
-  // Add spatial audio effect
-  playSpatialSound(soundName, position, maxDistance = 10) {
-    if (!this.isMuted && this.sounds[soundName]) {
-      const sound = this.sounds[soundName];
-      
-      // Calculate distance-based volume
-      const distance = Math.sqrt(
-        position.x * position.x +
-        position.y * position.y +
-        position.z * position.z
-      );
-      
-      const volume = Math.max(0, 1 - distance / maxDistance);
-      sound.volume(volume * this.effectsVolume);
-      
-      // Add stereo panning based on x position
-      const pan = Math.max(-1, Math.min(1, position.x / maxDistance));
-      sound.stereo(pan);
-      
-      sound.play();
-    }
+  if (savedEffectsVolume) {
+    useAudioStore.getState().setEffectsVolume(parseFloat(savedEffectsVolume))
   }
 }
 
-export const audioManager = new AudioManager();
+export const useAudioManager = () => {
+  const store = useAudioStore()
+  return {
+    isMuted: store.isMuted,
+    musicVolume: store.musicVolume,
+    effectsVolume: store.effectsVolume,
+    toggleMute: store.toggleMute,
+    setMusicVolume: store.setMusicVolume,
+    setEffectsVolume: store.setEffectsVolume,
+    playSound: store.playSound,
+    stopSound: store.stopSound,
+    initAudio: store.initAudio
+  }
+}
+
+export default useAudioManager

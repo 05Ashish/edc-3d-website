@@ -1,0 +1,55 @@
+.cursor-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  
+  .cursor-glow {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #00ffcc, #005577);
+    border-radius: 50%;
+    filter: blur(5px);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: pulse 1.5s infinite alternate;
+  }
+  
+  @keyframes pulse {
+    from {
+      transform: scale(1) translate(-50%, -50%);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1.5) translate(-50%, -50%);
+      opacity: 0.6;
+    }
+  }
+  
+  .cursor-coordinates {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    font-family: 'Cyberpunk', sans-serif; /* Use your Cyberpunk font */
+    font-size: 18px;
+    color: #00ffcc;
+    text-shadow: 0 0 5px #00ffcc, 0 0 10px #005577;
+    pointer-events: none;
+    animation: glow 1.5s infinite alternate;
+  }
+  
+  @keyframes glow {
+    from {
+      text-shadow: 0 0 5px #00ffcc, 0 0 10px #005577;
+    }
+    to {
+      text-shadow: 0 0 15px #00ffcc, 0 0 30px #005577;
+    }
+  }
+  

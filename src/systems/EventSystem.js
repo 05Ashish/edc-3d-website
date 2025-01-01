@@ -1,9 +1,7 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import { useEffect, useCallback } from 'react'
 import { useThree } from '@react-three/fiber'
-import * as THREE from 'three'
 
-// Create event store
 const useEventStore = create((set) => ({
   hoveredObject: null,
   selectedObject: null,
@@ -11,6 +9,9 @@ const useEventStore = create((set) => ({
   setHovered: (object) => set({ hoveredObject: object }),
   setSelected: (object) => set({ selectedObject: object }),
   registerObject: (object) => set((state) => {
+    if (object?.layers) {
+      object.layers.enable(1)
+    }
     state.interactiveObjects.add(object)
     return { interactiveObjects: new Set(state.interactiveObjects) }
   }),
@@ -20,69 +21,6 @@ const useEventStore = create((set) => ({
   })
 }))
 
-function EventSystem({ children }) {
-  const { camera, raycaster, mouse, scene } = useThree()
-  const setHovered = useEventStore((state) => state.setHovered)
-  const setSelected = useEventStore((state) => state.setSelected)
-  const interactiveObjects = useEventStore((state) => state.interactiveObjects)
-
-  const handlePointerMove = useCallback((event) => {
-    // Update mouse position
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-
-    // Update raycaster
-    raycaster.setFromCamera(mouse, camera)
-
-    // Check for intersections with interactive objects
-    const intersects = raycaster.intersectObjects(
-      Array.from(interactiveObjects),
-      true
-    )
-
-    if (intersects.length > 0) {
-      const object = intersects[0].object
-      setHovered(object)
-      document.body.style.cursor = 'pointer'
-    } else {
-      setHovered(null)
-      document.body.style.cursor = 'default'
-    }
-  }, [camera, mouse, raycaster, setHovered, interactiveObjects])
-
-  const handleClick = useCallback((event) => {
-    // Handle object selection
-    if (event.button === 0) { // Left click
-      raycaster.setFromCamera(mouse, camera)
-      const intersects = raycaster.intersectObjects(
-        Array.from(interactiveObjects),
-        true
-      )
-
-      if (intersects.length > 0) {
-        const object = intersects[0].object
-        setSelected(object)
-      } else {
-        setSelected(null)
-      }
-    }
-  }, [camera, mouse, raycaster, setSelected, interactiveObjects])
-
-  useEffect(() => {
-    window.addEventListener('pointermove', handlePointerMove)
-    window.addEventListener('click', handleClick)
-
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove)
-      window.removeEventListener('click', handleClick)
-      document.body.style.cursor = 'default'
-    }
-  }, [handlePointerMove, handleClick])
-
-  return children
-}
-
-// Custom hook for making objects interactive
 export function useInteractive(ref, {
   onHover,
   onUnhover,
@@ -95,15 +33,19 @@ export function useInteractive(ref, {
   const selectedObject = useEventStore((state) => state.selectedObject)
 
   useEffect(() => {
-    if (ref.current) {
-      registerObject(ref.current)
-      return () => unregisterObject(ref.current)
+    const currentRef = ref.current
+    if (currentRef) {
+      registerObject(currentRef)
+      return () => {
+        unregisterObject(currentRef)
+      }
     }
   }, [ref, registerObject, unregisterObject])
 
   useEffect(() => {
-    if (ref.current) {
-      if (hoveredObject === ref.current) {
+    const currentRef = ref.current
+    if (currentRef) {
+      if (hoveredObject === currentRef) {
         onHover?.()
       } else {
         onUnhover?.()
@@ -112,8 +54,9 @@ export function useInteractive(ref, {
   }, [ref, hoveredObject, onHover, onUnhover])
 
   useEffect(() => {
-    if (ref.current) {
-      if (selectedObject === ref.current) {
+    const currentRef = ref.current
+    if (currentRef) {
+      if (selectedObject === currentRef) {
         onClick?.()
       } else {
         onDeselect?.()
@@ -127,34 +70,60 @@ export function useInteractive(ref, {
   }
 }
 
-// Helper component for highlighting interactive objects
-export function InteractiveHighlight({ children }) {
-  const hoveredObject = useEventStore((state) => state.hoveredObject)
-  const selectedObject = useEventStore((state) => state.selectedObject)
+export function EventSystem({ children }) {
+  const { camera, raycaster } = useThree()
+  const setHovered = useEventStore((state) => state.setHovered)
+  const setSelected = useEventStore((state) => state.setSelected)
+  const interactiveObjects = useEventStore((state) => state.interactiveObjects)
 
-  useEffect(() => {
-    // Add highlight effect to hovered object
-    if (hoveredObject && hoveredObject.material) {
-      const originalEmissive = hoveredObject.material.emissive.clone()
-      hoveredObject.material.emissive.set(0x666666)
+  const handlePointerMove = useCallback((event) => {
+    const coords = {
+      x: (event.clientX / window.innerWidth) * 2 - 1,
+      y: -(event.clientY / window.innerHeight) * 2 + 1
+    }
 
-      return () => {
-        hoveredObject.material.emissive.copy(originalEmissive)
+    raycaster.setFromCamera(coords, camera)
+    const intersects = raycaster.intersectObjects(Array.from(interactiveObjects), true)
+
+    if (intersects.length > 0) {
+      const object = intersects[0].object
+      setHovered(object)
+      document.body.style.cursor = 'pointer'
+    } else {
+      setHovered(null)
+      document.body.style.cursor = 'default'
+    }
+  }, [camera, raycaster, setHovered, interactiveObjects])
+
+  const handleClick = useCallback((event) => {
+    if (event.button === 0) {
+      const coords = {
+        x: (event.clientX / window.innerWidth) * 2 - 1,
+        y: -(event.clientY / window.innerHeight) * 2 + 1
+      }
+
+      raycaster.setFromCamera(coords, camera)
+      const intersects = raycaster.intersectObjects(Array.from(interactiveObjects), true)
+
+      if (intersects.length > 0) {
+        const object = intersects[0].object
+        setSelected(object)
+      } else {
+        setSelected(null)
       }
     }
-  }, [hoveredObject])
+  }, [camera, raycaster, setSelected, interactiveObjects])
 
   useEffect(() => {
-    // Add highlight effect to selected object
-    if (selectedObject && selectedObject.material) {
-      const originalEmissive = selectedObject.material.emissive.clone()
-      selectedObject.material.emissive.set(0x999999)
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('click', handleClick)
 
-      return () => {
-        selectedObject.material.emissive.copy(originalEmissive)
-      }
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('click', handleClick)
+      document.body.style.cursor = 'default'
     }
-  }, [selectedObject])
+  }, [handlePointerMove, handleClick])
 
   return children
 }

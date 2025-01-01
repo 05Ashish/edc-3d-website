@@ -1,169 +1,138 @@
-// src/systems/LoadingManager.js
-import { create } from 'zustand';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { TextureLoader } from 'three';
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import { create } from 'zustand'
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 
 const useLoadingStore = create((set) => ({
-  progress: 0,
   isLoading: true,
-  setProgress: (progress) => set({ progress }),
-  setIsLoading: (isLoading) => set({ isLoading }),
-  totalItems: 0,
-  loadedItems: 0,
-  updateProgress: () => set((state) => {
-    const progress = (state.loadedItems + 1) / state.totalItems * 100;
-    return {
-      loadedItems: state.loadedItems + 1,
-      progress
-    };
-  })
-}));
+  progress: 0,
+  errors: [],
+  assets: {},
 
-class LoadingManager {
+  setProgress: (value) => set({ progress: value }),
+  setLoading: (value) => set({ isLoading: value }),
+  addError: (error) => set((state) => ({ 
+    errors: [...state.errors, error] 
+  })),
+  addAsset: (key, asset) => set((state) => ({
+    assets: { ...state.assets, [key]: asset }
+  }))
+}))
+
+class AssetLoader {
   constructor() {
     // Initialize loaders
-    this.textureLoader = new TextureLoader();
-    this.gltfLoader = new GLTFLoader();
-    this.fontLoader = new FontLoader();
-    this.dracoLoader = new DRACOLoader();
+    this.textureLoader = new THREE.TextureLoader()
+    this.gltfLoader = new GLTFLoader()
+    this.audioLoader = new THREE.AudioLoader()
     
-    // Configure DRACO loader
-    this.dracoLoader.setDecoderPath('/draco/');
-    this.gltfLoader.setDRACOLoader(this.dracoLoader);
+    // Setup DRACO loader
+    const dracoLoader = new DRACOLoader()
+    dracoLoader.setDecoderPath('/draco/')
+    this.gltfLoader.setDRACOLoader(dracoLoader)
 
-    // Asset lists
+    // Asset manifests
     this.textures = {
-      'envMap': '/assets/textures/environment.jpg',
-      'groundTexture': '/assets/textures/ground.jpg',
-      // Add more textures here
-    };
-
-    this.models = {
-      'edcLogo': '/assets/models/edc-logo.glb',
-      'decorations': '/assets/models/decorations.glb',
-      // Add more models here
-    };
-
-    this.fonts = {
-      'cyberpunk': '/fonts/cyberpunk.json'
-    };
-
-    // Calculate total items to load
-    const totalItems = 
-      Object.keys(this.textures).length +
-      Object.keys(this.models).length +
-      Object.keys(this.fonts).length;
+      'environment': 'src/assets/textures/environment.jpg'
+    }
     
-    useLoadingStore.setState({ totalItems });
+    this.models = {
+      'logo': '/assets/models/edc-logo.glb'
+    }
+    
+    this.sounds = {
+      'background': '/assets/sounds/background.mp3',
+      'hover': '/assets/sounds/hover.mp3',
+      'click': '/assets/sounds/click.mp3',
+      'transition': '/assets/sounds/transition.mp3'
+    }
   }
 
   async loadTexture(url) {
     return new Promise((resolve, reject) => {
       this.textureLoader.load(
         url,
-        (texture) => {
-          useLoadingStore.getState().updateProgress();
-          resolve(texture);
-        },
+        resolve,
         undefined,
         reject
-      );
-    });
+      )
+    })
   }
 
   async loadModel(url) {
     return new Promise((resolve, reject) => {
       this.gltfLoader.load(
         url,
-        (gltf) => {
-          useLoadingStore.getState().updateProgress();
-          resolve(gltf);
-        },
+        resolve,
         undefined,
         reject
-      );
-    });
+      )
+    })
   }
 
-  async loadFont(url) {
+  async loadSound(url) {
     return new Promise((resolve, reject) => {
-      this.fontLoader.load(
+      this.audioLoader.load(
         url,
-        (font) => {
-          useLoadingStore.getState().updateProgress();
-          resolve(font);
-        },
+        resolve,
         undefined,
         reject
-      );
-    });
+      )
+    })
   }
 
   async loadAll() {
-    useLoadingStore.setState({ isLoading: true, progress: 0 });
+    const store = useLoadingStore.getState()
+    const totalAssets = 
+      Object.keys(this.textures).length + 
+      Object.keys(this.models).length + 
+      Object.keys(this.sounds).length
+
+    let loadedAssets = 0
 
     try {
       // Load textures
-      const loadedTextures = await Promise.all(
-        Object.entries(this.textures).map(async ([key, url]) => {
-          const texture = await this.loadTexture(url);
-          return [key, texture];
-        })
-      );
+      for (const [key, url] of Object.entries(this.textures)) {
+        const texture = await this.loadTexture(url)
+        store.addAsset(`texture_${key}`, texture)
+        loadedAssets++
+        store.setProgress((loadedAssets / totalAssets) * 100)
+      }
 
       // Load models
-      const loadedModels = await Promise.all(
-        Object.entries(this.models).map(async ([key, url]) => {
-          const model = await this.loadModel(url);
-          return [key, model];
-        })
-      );
+      for (const [key, url] of Object.entries(this.models)) {
+        const model = await this.loadModel(url)
+        store.addAsset(`model_${key}`, model)
+        loadedAssets++
+        store.setProgress((loadedAssets / totalAssets) * 100)
+      }
 
-      // Load fonts
-      const loadedFonts = await Promise.all(
-        Object.entries(this.fonts).map(async ([key, url]) => {
-          const font = await this.loadFont(url);
-          return [key, font];
-        })
-      );
+      // Load sounds
+      for (const [key, url] of Object.entries(this.sounds)) {
+        const sound = await this.loadSound(url)
+        store.addAsset(`sound_${key}`, sound)
+        loadedAssets++
+        store.setProgress((loadedAssets / totalAssets) * 100)
+      }
 
-      // Convert arrays to objects
-      const textures = Object.fromEntries(loadedTextures);
-      const models = Object.fromEntries(loadedModels);
-      const fonts = Object.fromEntries(loadedFonts);
-
-      useLoadingStore.setState({ isLoading: false, progress: 100 });
-
-      return { textures, models, fonts };
+      store.setLoading(false)
     } catch (error) {
-      console.error('Error loading assets:', error);
-      useLoadingStore.setState({ isLoading: false });
-      throw error;
+      store.addError(error)
+      console.error('Error loading assets:', error)
     }
   }
 }
 
-export const loadingManager = new LoadingManager();
+export const assetLoader = new AssetLoader()
 
-// Hook for components to access loading state
-export function useLoading() {
-  return useLoadingStore((state) => ({
-    progress: state.progress,
-    isLoading: state.isLoading
-  }));
-}
-
-// Usage example:
-/*
-async function loadAssets() {
-  try {
-    const { textures, models, fonts } = await loadingManager.loadAll();
-    // Use loaded assets
-  } catch (error) {
-    console.error('Failed to load assets:', error);
+export const useLoadingManager = () => {
+  const store = useLoadingStore()
+  return {
+    isLoading: store.isLoading,
+    progress: store.progress,
+    errors: store.errors,
+    assets: store.assets
   }
 }
-*/
+
+export default useLoadingManager

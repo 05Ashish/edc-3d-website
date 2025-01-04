@@ -21,7 +21,7 @@ const sounds = {
   }),
   transition: new Howl({
     src: ['src/assets/sounds/low-dark-impact-for-transition-231471.mp3'],
-    volume: 0.2
+    volume: 0.3
   })
 }
 

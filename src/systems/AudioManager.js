@@ -3,7 +3,7 @@ import { Howl } from 'howler'
 
 const sounds = {
   background: new Howl({
-    src: ['/assets/sounds/background.mp3'],
+    src: ['src/assets/sounds/background.mp3'],
     loop: true,
     volume: 0.3
   }),
@@ -12,12 +12,16 @@ const sounds = {
     volume: 0.5
   }),
   click: new Howl({
-    src: ['/assets/sounds/click.mp3'],
+    src: ['src/assets/sounds/click.mp3'],
+    volume: 0.5
+  }),
+  endLoadingScreen: new Howl({
+    src: ['src/assets/sounds/production-elements-impactor-e-188986.mp3'],
     volume: 0.5
   }),
   transition: new Howl({
-    src: ['/assets/sounds/transition.mp3'],
-    volume: 0.5
+    src: ['src/assets/sounds/low-dark-impact-for-transition-231471.mp3'],
+    volume: 0.3
   })
 }
 
@@ -53,7 +57,7 @@ const useAudioStore = create((set, get) => ({
   },
 
   setEffectsVolume: (volume) => {
-    ['hover', 'click', 'transition'].forEach(soundKey => {
+    ['hover', 'click', 'transition', "endLoadingScreen"].forEach(soundKey => {
       sounds[soundKey].volume(volume)
     })
     set({ effectsVolume: volume })

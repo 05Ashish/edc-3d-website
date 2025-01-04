@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+/home/codemaster29/Documents/Coding_Stuff/edc-3d-website/package-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

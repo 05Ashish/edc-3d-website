@@ -1,9 +1,11 @@
-// src/components/ui/LoadingScreen.jsx
-import React, { useEffect, useState } from 'react'
-import styled, { keyframes } from 'styled-components'
-import { motion } from 'framer-motion'
+import React, { useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { motion } from 'framer-motion';
 import { Howl } from 'howler';
+import { useAudioManager } from '../../systems/AudioManager';
 
+
+// Keyframes for animations
 const glitch = keyframes`
   0% {
     clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%);
@@ -57,7 +59,7 @@ const glitch = keyframes`
     clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%);
     transform: translate(-10px);
   }
-`
+`;
 
 const flicker = keyframes`
   0% { opacity: 0.1; }
@@ -72,13 +74,14 @@ const flicker = keyframes`
   72% { opacity: 0.2; }
   77% { opacity: 0.9; }
   100% { opacity: 0.9; }
-`
+`;
 
 const textScanline = keyframes`
   0% { transform: translateY(0); }
   100% { transform: translateY(100vh); }
-`
+`;
 
+// Styled components
 const LoadingContainer = styled.div`
   position: fixed;
   top: 0;
@@ -124,7 +127,7 @@ const LoadingContainer = styled.div`
     background-size: 100% 4px;
     pointer-events: none;
   }
-`
+`;
 
 const GlitchText = styled(motion.div)`
   color: #00B4D8;
@@ -156,15 +159,7 @@ const GlitchText = styled(motion.div)`
     animation: ${glitch} 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite reverse;
     animation-delay: 0.2s;
   }
-`
-
-
-const loadingAudio = new Howl({
-  src: ['src/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'],
-  volume: 0.5,
-  html5: true,
-  preload: false,
-});
+`;
 
 const LightsaberContainer = styled.div`
   width: 400px;
@@ -173,7 +168,7 @@ const LightsaberContainer = styled.div`
   margin: 2rem 0;
   display: flex;
   align-items: center;
-`
+`;
 
 const SaberHandle = styled.div`
   width: 60px;
@@ -181,7 +176,7 @@ const SaberHandle = styled.div`
   background: linear-gradient(90deg, #2b2b2b 0%, #414141 100%);
   border-radius: 4px;
   position: relative;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
   z-index: 10;
 
   &::before {
@@ -195,19 +190,19 @@ const SaberHandle = styled.div`
     background: #1a1a1a;
     border-radius: 2px;
   }
-`
+`;
 
 const SaberBlade = styled(motion.div)`
   position: absolute;
   height: 8px;
-  background: ${props => props.color};
+  background: ${(props) => props.color};
   border-radius: 4px;
-  box-shadow: 0 0 10px ${props => props.color},
-              0 0 20px ${props => props.color},
-              0 0 30px ${props => props.color},
-              0 0 40px ${props => props.color};
+  box-shadow: 0 0 10px ${(props) => props.color},
+    0 0 20px ${(props) => props.color},
+    0 0 30px ${(props) => props.color},
+    0 0 40px ${(props) => props.color};
   transform-origin: left center;
-  width: ${props => `${props.width}%`};
+  width: ${(props) => `${props.width}%`};
   z-index: 5;
 
   &::before {
@@ -217,7 +212,7 @@ const SaberBlade = styled(motion.div)`
     left: 0;
     right: 0;
     bottom: 0;
-    background: ${props => props.color};
+    background: ${(props) => props.color};
     border-radius: inherit;
     opacity: 0.7;
   }
@@ -234,7 +229,7 @@ const SaberBlade = styled(motion.div)`
     opacity: 0.3;
     filter: blur(4px);
   }
-`
+`;
 
 const GlitchText2 = styled(motion.div)`
   color: #00B4D8;
@@ -242,7 +237,7 @@ const GlitchText2 = styled(motion.div)`
   opacity: 0.8;
   text-shadow: 2px 2px #ff0000, -2px -2px #0000ff;
   animation: ${flicker} 3s linear infinite;
-`
+`;
 
 const Scanline = styled.div`
   position: absolute;
@@ -252,25 +247,30 @@ const Scanline = styled.div`
   height: 8px;
   background: rgba(255, 255, 255, 0.1);
   animation: ${textScanline} 6s linear infinite;
-`
+`;
 
-const lightsaberColors = [
-  '#00ff00',
-  '#0000ff',
-  '#ff0000',
-  '#800080',
-  '#ffff00'
-]
+// Lightsaber colors
+const lightsaberColors = ['#00ff00', '#0000ff', '#ff0000', '#800080', '#ffff00'];
+
+// Audio for loading screen
+const loadingAudio = new Howl({
+  src: ['src/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'],
+  volume: 0.8,
+  html5: true,
+  preload: false,
+});
 
 const LoadingScreen = () => {
-  const [progress, setProgress] = useState(0)
-  const [saberColor, setSaberColor] = useState(lightsaberColors[0])
-  const [glitchText, setGlitchText] = useState('ERROR')
-  const [isVisible, setIsVisible] = useState(true)
+  const [progress, setProgress] = useState(0);
+  const [saberColor, setSaberColor] = useState(lightsaberColors[0]);
+  const [glitchText, setGlitchText] = useState('ERROR');
+  const [isVisible, setIsVisible] = useState(true);
+  const { playSound } = useAudioManager();
 
   useEffect(() => {
-    const randomColor = lightsaberColors[Math.floor(Math.random() * lightsaberColors.length)]
-    setSaberColor(randomColor)
+    // Set a random lightsaber color
+    const randomColor = lightsaberColors[Math.floor(Math.random() * lightsaberColors.length)];
+    setSaberColor(randomColor);
 
     // Try to play the loading audio
     try {
@@ -279,47 +279,61 @@ const LoadingScreen = () => {
       console.error('Error playing audio:', error);
     }
 
+    // Glitch text animation
     const texts = [
       'SYSTEM BREACH...',
       'INITIALIZING...',
       'ACCESS GRANTED',
       'LOADING EDC...',
-      'DECRYPTING...'
-    ]
-    
-    let textIndex = 0
+      'DECRYPTING...',
+    ];
+    let textIndex = 0;
     const textInterval = setInterval(() => {
-      setGlitchText(texts[textIndex % texts.length])
-      textIndex++
-    }, 800)
+      setGlitchText(texts[textIndex % texts.length]);
+      textIndex++;
+    }, 800);
 
+    // Progress bar animation
     const interval = setInterval(() => {
-      setProgress(prev => {
+      setProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval)
-          return 100
+          clearInterval(interval);
+          return 100;
         }
-        return prev + 1
-      })
-    }, 50)
+        return prev + 1;
+        playSound('endLoadingScreen');
+      });
+    }, 50);
 
+    // Timeout to complete loading
     const timeout = setTimeout(() => {
-      setIsVisible(false)
+      
+    
+      setIsVisible(false);
       // Dispatch an event when loading is complete
-      window.dispatchEvent(new Event('loadingComplete'))
+      window.dispatchEvent(new CustomEvent('loadingComplete'));
       // Stop the audio when loading is complete
       loadingAudio.stop();
-    }, 6000)
+      playSound('endLoadingScreen');
 
+    }, 6000);
+
+    // Cleanup
     return () => {
-      clearInterval(interval)
-      clearInterval(textInterval)
-      clearTimeout(timeout)
+      clearInterval(interval);
+      clearInterval(textInterval);
+      clearTimeout(timeout);
       loadingAudio.stop();
-    }
-  }, [])
 
-  if (!isVisible) return null
+      console.log('Loading complete');
+    };
+  }, []);
+
+  if (!isVisible) 
+    {
+      console.log('not visible');
+      return null
+    };
 
   return (
     <LoadingContainer>
@@ -327,14 +341,11 @@ const LoadingScreen = () => {
       <GlitchText>EDC MAIT</GlitchText>
       <LightsaberContainer>
         <SaberHandle />
-        <SaberBlade
-          color={saberColor}
-          width={progress}
-        />
+        <SaberBlade color={saberColor} width={progress} />
       </LightsaberContainer>
       <GlitchText2>{glitchText}</GlitchText2>
     </LoadingContainer>
-  )
-}
+  );
+};
 
-export default LoadingScreen
+export default LoadingScreen;

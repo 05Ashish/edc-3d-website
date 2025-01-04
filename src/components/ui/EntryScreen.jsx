@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import cyberpunkFont from '../../assets/fonts/cyberpunk.woff';
+import { useAudioManager } from "../../systems/AudioManager.js";
 
 const matrixRain = keyframes`
   0% { transform: translateY(-100%); }
@@ -310,6 +311,7 @@ const EntryScreen = ({ onEnter }) => {
   const [glitchText, setGlitchText] = useState('INITIALIZE SYSTEM');
   const [bsodProgress, setBsodProgress] = useState(0);
   const [errorCode, setErrorCode] = useState('0x00000000');
+  const { playSound } = useAudioManager(); 
 
   useEffect(() => {
     const texts = [
@@ -384,12 +386,18 @@ const EntryScreen = ({ onEnter }) => {
           Order 66
           <span>{glitchText}</span>
         </Title>
-        <EntryButton onClick={handleClick}>
+        <EntryButton
+          onClick={() => {
+            playSound('click');
+            handleClick();
+          }}
+        >
           Initialize Protocol
         </EntryButton>
       </EntryContainer>
     </>
   );
+  
 };
 
 export default EntryScreen;

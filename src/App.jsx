@@ -1,7 +1,7 @@
-// App.jsx
-import React, { useState, Suspense, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import styled from 'styled-components';
+import { Howl } from 'howler'
 import { Loader } from '@react-three/drei';
 import LoadingScreen from './components/ui/LoadingScreen';
 import Experience from './components/Experience';
@@ -23,7 +23,6 @@ function App() {
   const audioManager = useAudioManager();
 
   const handleEntryClick = () => {
-    // Only handle click, EntryScreen will handle its own fade out
     audioManager.playSound('transition');
     setScreen('bsod');
   };
@@ -33,31 +32,35 @@ function App() {
     setScreen('loading');
   };
 
-  const handleLoadingComplete = () => {
-    audioManager.initAudio();
-    setScreen('experience');
-  };
+  useEffect(() => {
+    const handleLoadingComplete = () => {
+      audioManager.initAudio();
+      setScreen('experience');
+    };
+
+    window.addEventListener('loadingComplete', handleLoadingComplete);
+
+    return () => {
+      window.removeEventListener('loadingComplete', handleLoadingComplete);
+    };
+  }, [audioManager]);
 
   return (
     <AppContainer>
       {screen === 'entry' && (
         <EntryScreen 
           onEnter={handleEntryClick} 
-          // Remove any transition logic from EntryScreen props
         />
       )}
       
       {screen === 'bsod' && (
         <BSODTransition 
           onTransitionEnd={handleBSODComplete}
-          // Pass as a simple callback
         />
       )}
       
       {screen === 'loading' && (
-        <LoadingScreen 
-          onComplete={handleLoadingComplete}
-        />
+        <LoadingScreen />
       )}
       
       {screen === 'experience' && (

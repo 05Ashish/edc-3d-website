@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Environment, Stars } from '@react-three/drei';
 import MAITEDCLogo from './3d/MAITEDCLogo';
@@ -9,7 +9,6 @@ import EventsSection from './sections/EventsSection';
 import GallerySection from './sections/GallerySection';
 import TeamSection from './sections/TeamSection';
 import { useAudioManager } from '../systems/AudioManager';
-import Cursor from './ui/Cursor'; // Import Cursor component
 
 const SECTIONS = {
   HOME: 'home',
@@ -54,15 +53,12 @@ const Experience = () => {
 
       {/* Main Content */}
       <group ref={mainGroupRef}>
-        {/* Logo */}
-        <MAITEDCLogo position={[0, 2, 0]} />
-
+        {/* Logo with Error Handling */}
+          <MAITEDCLogo position={[0, 2, 0]} />
         {/* Particle Effects */}
         <ParticleSystem />
-
         {/* Portal Effects */}
         <PortalEffect position={[0, 0, -5]} />
-
         {/* Sections */}
         {activeSection === SECTIONS.ABOUT && (
           <AboutSection onClose={() => handleSectionChange(SECTIONS.HOME)} />
@@ -85,9 +81,6 @@ const Experience = () => {
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={1} />
       <pointLight position={[-10, -10, -10]} color="#00B4D8" intensity={0.5} />
-
-      {/* Cursor */}
-      <Cursor /> {/* Add Cursor Component */}
     </>
   );
 };

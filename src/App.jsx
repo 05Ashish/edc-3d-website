@@ -16,6 +16,8 @@ import EventsPage from './pages/EventsPage';
 import GalleryPage from './pages/GalleryPage';
 import TeamPage from './pages/TeamPage';
 import Navbar from './components/ui/Navbar'; // Assuming you create a Navbar
+import Cursor from './components/ui/Cursor';
+
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -50,6 +52,7 @@ function App() {
 
   return (
     <AppContainer>
+      <Cursor />
       <Router>
         <Navbar />
         <Routes>
@@ -86,6 +89,7 @@ function App() {
                 <Loader />
               </Suspense>
             } />
+
           )}
 
           <Route path="/about" element={<AboutPage />} />

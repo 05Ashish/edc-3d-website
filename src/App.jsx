@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import styled from 'styled-components';
 import { Howl } from 'howler';
@@ -9,6 +9,7 @@ import EntryScreen from './components/ui/EntryScreen';
 import BSODTransition from './components/ui/BSODTransition';
 import { useAudioManager } from './systems/AudioManager';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Experience from './components/Experience';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import EventsPage from './pages/EventsPage';
@@ -39,18 +40,13 @@ function App() {
     setScreen('loading');
   };
 
-  useEffect(() => {
-    const handleLoadingComplete = () => {
-      audioManager.initAudio();
-      setScreen('experience');
-    };
-
-    window.addEventListener('loadingComplete', handleLoadingComplete);
-
-    return () => {
-      window.removeEventListener('loadingComplete', handleLoadingComplete);
-    };
+  const handleLoadingComplete = useCallback(() => {
+    console.log('handleLoadingComplete called'); // Debug log
+    audioManager.initAudio();
+    setScreen('experience');
   }, [audioManager]);
+
+  console.log('Current screen:', screen); // Debug log
 
   return (
     <AppContainer>
@@ -66,14 +62,16 @@ function App() {
           )}
 
           {screen === 'loading' && (
-            <Route path="/" element={<LoadingScreen />} />
+            <Route path="/" element={
+              <LoadingScreen onEndLoading={handleLoadingComplete} />
+            } />
           )}
 
           {screen === 'experience' && (
             <Route path="/" element={
-              <>
+              <Suspense fallback={<div>Loading Experience...</div>}>
                 <Canvas
-                  camera={{ position: [0, -10, 20], fov: 80 }}
+                  camera={{ position: [0, 10, 20], fov: 80 }}
                   dpr={[1, 2]}
                   gl={{
                     antialias: true,
@@ -86,7 +84,7 @@ function App() {
                   </Suspense>
                 </Canvas>
                 <Loader />
-              </>
+              </Suspense>
             } />
           )}
 

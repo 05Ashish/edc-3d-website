@@ -260,7 +260,7 @@ const loadingAudio = new Howl({
   preload: false,
 });
 
-const LoadingScreen = () => {
+const LoadingScreen = ({ onEndLoading }) => {
   const [progress, setProgress] = useState(0);
   const [saberColor, setSaberColor] = useState(lightsaberColors[0]);
   const [glitchText, setGlitchText] = useState('ERROR');
@@ -268,6 +268,22 @@ const LoadingScreen = () => {
   const { playSound } = useAudioManager();
 
   useEffect(() => {
+    console.log('LoadingScreen mounted with onEndLoading:', !!onEndLoading); // Debug log
+
+    const timeout = setTimeout(() => {
+      console.log('Loading timeout completed'); // Debug log
+      
+      // Call onEndLoading before setting isVisible to false
+      if (onEndLoading) {
+        console.log('Calling onEndLoading callback'); // Debug log
+        onEndLoading();
+      }
+
+      setIsVisible(false);
+      loadingAudio.stop();
+      playSound('endLoadingScreen');
+    }, 6000);
+
     // Set a random lightsaber color
     const randomColor = lightsaberColors[Math.floor(Math.random() * lightsaberColors.length)];
     setSaberColor(randomColor);
@@ -301,22 +317,8 @@ const LoadingScreen = () => {
           return 100;
         }
         return prev + 1;
-        playSound('endLoadingScreen');
       });
     }, 50);
-
-    // Timeout to complete loading
-    const timeout = setTimeout(() => {
-      
-    
-      setIsVisible(false);
-      // Dispatch an event when loading is complete
-      window.dispatchEvent(new CustomEvent('loadingComplete'));
-      // Stop the audio when loading is complete
-      loadingAudio.stop();
-      playSound('endLoadingScreen');
-
-    }, 6000);
 
     // Cleanup
     return () => {
@@ -327,13 +329,14 @@ const LoadingScreen = () => {
 
       console.log('Loading complete');
     };
-  }, []);
+  }, [onEndLoading, playSound]);
 
-  if (!isVisible) 
-    {
-      console.log('not visible');
-      return null
-    };
+  console.log('LoadingScreen render, isVisible:', isVisible); // Debug log
+
+  if (!isVisible) {
+    console.log('LoadingScreen hidden'); // Debug log
+    return null;
+  }
 
   return (
     <LoadingContainer>

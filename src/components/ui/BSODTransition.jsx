@@ -151,17 +151,9 @@ const BSODTransition = ({ onTransitionEnd }) => {
   }, [onTransitionEnd]);
 
   return (
-    <Container>
-      <ErrorTitle>SYSTEM_CRITICAL_FAILURE</ErrorTitle>
-      <ErrorMessage>Error Code: {errorCode}</ErrorMessage>
-      <ErrorMessage>MEMORY_MANAGEMENT_ERROR</ErrorMessage>
-      <ErrorMessage>SYSTEM_THREAD_EXCEPTION_NOT_HANDLED</ErrorMessage>
-      <ErrorMessage>IRQL_NOT_LESS_OR_EQUAL</ErrorMessage>
-      <ErrorMessage>ATTEMPTING_EMERGENCY_OVERRIDE...</ErrorMessage>
-      <ErrorMessage>BYPASSING_SECURITY_PROTOCOLS...</ErrorMessage>
-      <ProgressBar $progress={progress} />
-      <ErrorMessage>System Recovery: {progress}% Complete</ErrorMessage>
-    </Container>
+    <div>
+      
+    </div>
   );
 };
 

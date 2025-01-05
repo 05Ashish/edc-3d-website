@@ -1,27 +1,38 @@
+// src/components/ui/Navbar.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../styles/navbar.css';
+import styled from 'styled-components';
 
-const Navbar = () => {
+const NavContainer = styled.nav`
+  display: flex;
+  justify-content: space-around;
+  background-color: #000;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+`;
+
+const NavLink = styled(Link)`
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  &:hover {
+    color: #00B4D8;
+  }
+`;
+
+function Navbar() {
   return (
-    <nav className="navbar">
-      <Link to="/" className="nav-link">
-        Home
-      </Link>
-      <Link to="/about" className="nav-link">
-        About
-      </Link>
-      <Link to="/events" className="nav-link">
-        Events
-      </Link>
-      <Link to="/gallery" className="nav-link">
-        Gallery
-      </Link>
-      <Link to="/team" className="nav-link">
-        Team
-      </Link>
-    </nav>
+    <NavContainer>
+      <NavLink to="/">Home</NavLink>
+      <NavLink to="/about">About</NavLink>
+      <NavLink to="/events">Events</NavLink>
+      <NavLink to="/gallery">Gallery</NavLink>
+      <NavLink to="/team">Team</NavLink>
+    </NavContainer>
   );
-};
+}
 
 export default Navbar;

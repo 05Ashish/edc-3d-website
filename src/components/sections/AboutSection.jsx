@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import { Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { animated, useSpring } from '@react-spring/three'
+
 const AboutCard = ({ position, title, content }) => {
   const meshRef = useRef()
 
@@ -51,6 +52,12 @@ const AboutCard = ({ position, title, content }) => {
 const AboutSection = ({ onClose }) => {
   const groupRef = useRef()
 
+  const [springs] = useSpring(() => ({
+    from: { scale: 0, opacity: 0 },
+    to: { scale: 1, opacity: 1 },
+    config: { duration: 500 }
+  }))
+
   const cards = [
     {
       title: "Our Vision",
@@ -70,12 +77,9 @@ const AboutSection = ({ onClose }) => {
   ]
 
   return (
-    <motion.group
+    <animated.group
       ref={groupRef}
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      {...springs}
     >
       <Text
         position={[0, 3, 0]}
@@ -105,7 +109,7 @@ const AboutSection = ({ onClose }) => {
         The Entrepreneurship Development Cell of MAIT is a student-run organization
         that aims to foster the spirit of entrepreneurship among students.
       </Text>
-    </motion.group>
+    </animated.group>
   )
 }
 

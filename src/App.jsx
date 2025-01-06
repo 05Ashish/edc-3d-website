@@ -10,6 +10,7 @@ import { useAudioManager } from './systems/AudioManager';
 import Experience from './components/Experience';
 import Navbar from './components/ui/Navbar';
 import Cursor from './components/ui/Cursor';
+import ParticleSystem from './components/effects/ParticleSystem';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -23,6 +24,7 @@ const AppContainer = styled.div`
 function App() {
   const [screen, setScreen] = useState('entry');
   const audioManager = useAudioManager();
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0, z: 0 });
 
   const handleEntryClick = () => {
     audioManager.playSound('transition');
@@ -41,7 +43,7 @@ function App() {
 
   return (
     <AppContainer>
-      <Cursor />
+      <Cursor onMove={setCursorPosition} />
       {screen === 'entry' && (
         <EntryScreen onEnter={handleEntryClick} />
       )}
@@ -50,9 +52,9 @@ function App() {
         <BSODTransition onTransitionEnd={handleBSODComplete} />
       )}
 
-      {screen === 'loading' && (
-        <LoadingScreen onEndLoading={handleLoadingComplete} />
-      )}
+        {screen === 'loading' && (
+          <LoadingScreen onEndLoading={handleLoadingComplete} />
+        )}
 
       {screen === 'experience' && (
         <>
@@ -63,7 +65,7 @@ function App() {
           }} />
           <Suspense fallback={<div>Loading Experience...</div>}>
             <Canvas
-              camera={{ position: [0, 10, 20], fov: 80 }}
+              camera={{ position: [0, 0, 15], fov: 75 }}
               dpr={[1, 2]}
               gl={{
                 antialias: true,
@@ -73,6 +75,7 @@ function App() {
             >
               <Suspense fallback={null}>
                 <Experience />
+                <ParticleSystem />
               </Suspense>
             </Canvas>
             <Loader />

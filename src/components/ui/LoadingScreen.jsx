@@ -255,7 +255,7 @@ const lightsaberColors = ['#00ff00', '#0000ff', '#ff0000', '#800080', '#ffff00']
 // Audio for loading screen
 const loadingAudio = new Howl({
   src: ['src/assets/sounds/wake_up_johnny_silverh-[AudioTrimmer.com].mp3'],
-  volume: 0.8,
+  volume: 0.4,
   html5: true,
   preload: false,
 });

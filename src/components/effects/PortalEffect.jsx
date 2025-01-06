@@ -66,7 +66,7 @@ const PortalEffect = ({ position = [0, 0, 0] }) => {
       ref={portalRef}
       position={position}
     >
-      <planeGeometry args={[5, 5]} />
+      <planeGeometry args={[20, 20]} />
       <portalMaterial
         ref={materialRef}
         transparent

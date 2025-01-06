@@ -11,10 +11,12 @@ const NavContainer = styled.nav`
   top: 0;
   width: 100%;
   z-index: 1000;
+  pointer-events: auto !important;
 `;
 
 const NavLink = styled.button`
   color: #fff;
+  pointer-events: auto !important;
   text-decoration: none;
   font-weight: bold;
   background: none;

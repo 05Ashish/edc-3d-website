@@ -118,11 +118,12 @@ const EntryContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
+  z-index: 1000;
   overflow: hidden;
   font-family: 'Cyberpunk', sans-serif;
   transition: opacity 0.5s ease;
   opacity: ${props => props.$fading ? 0 : 1};
+  pointer-events: auto !important;
   
   &::before {
     content: '';
@@ -207,6 +208,7 @@ const EntryButton = styled.button`
   text-transform: uppercase;
   letter-spacing: 4px;
   transition: all 0.3s ease;
+  pointer-events: auto !important;
 
   &::before {
     content: '';

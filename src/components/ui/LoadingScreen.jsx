@@ -95,6 +95,8 @@ const LoadingContainer = styled.div`
   align-items: center;
   z-index: 1000;
   overflow: hidden;
+  cursor: none !important;
+  pointer-events: none;
 
   &::before {
     content: "";
@@ -265,37 +267,46 @@ const LoadingScreen = ({ onEndLoading }) => {
   const [saberColor, setSaberColor] = useState(lightsaberColors[0]);
   const [glitchText, setGlitchText] = useState('ERROR');
   const [isVisible, setIsVisible] = useState(true);
+  const [hasStarted, setHasStarted] = useState(false);
   const { playSound } = useAudioManager();
 
   useEffect(() => {
-    console.log('LoadingScreen mounted with onEndLoading:', !!onEndLoading); // Debug log
+    if (hasStarted) return; // Prevent multiple initializations
+    setHasStarted(true);
 
-    const timeout = setTimeout(() => {
-      console.log('Loading timeout completed'); // Debug log
-      
-      // Call onEndLoading before setting isVisible to false
-      if (onEndLoading) {
-        console.log('Calling onEndLoading callback'); // Debug log
-        onEndLoading();
-      }
-
-      setIsVisible(false);
-      loadingAudio.stop();
-      playSound('endLoadingScreen');
-    }, 6000);
-
-    // Set a random lightsaber color
+    // Completely disable cursor and any interaction
+    document.body.style.cursor = 'none';
+    document.body.style.overflow = 'hidden';
+    document.body.style.pointerEvents = 'none';
+    
+    // Set random color only once
     const randomColor = lightsaberColors[Math.floor(Math.random() * lightsaberColors.length)];
     setSaberColor(randomColor);
 
-    // Try to play the loading audio
+    // Play audio only once
     try {
       loadingAudio.play();
     } catch (error) {
       console.error('Error playing audio:', error);
     }
 
-    // Glitch text animation
+    const timeout = setTimeout(() => {
+      console.log('Loading timeout completed');
+      
+      if (onEndLoading) {
+        console.log('Calling onEndLoading callback');
+        onEndLoading();
+      }
+
+      setIsVisible(false);
+      loadingAudio.stop();
+      playSound('endLoadingScreen');
+      
+      // Re-enable cursor and scroll after loading
+      document.body.style.cursor = 'none'; // Keep cursor none for custom cursor
+      document.body.style.overflow = 'auto';
+    }, 6000);
+
     const texts = [
       'SYSTEM BREACH...',
       'INITIALIZING...',
@@ -309,7 +320,6 @@ const LoadingScreen = ({ onEndLoading }) => {
       textIndex++;
     }, 800);
 
-    // Progress bar animation
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -326,15 +336,19 @@ const LoadingScreen = ({ onEndLoading }) => {
       clearInterval(textInterval);
       clearTimeout(timeout);
       loadingAudio.stop();
-
+      
+      // Ensure cursor and scroll are re-enabled on unmount
+      document.body.style.cursor = 'none'; // Keep cursor none for custom cursor
+      document.body.style.overflow = 'auto';
+      
       console.log('Loading complete');
     };
-  }, [onEndLoading, playSound]);
+  }, []);  // Empty dependency array to run only once
 
-  console.log('LoadingScreen render, isVisible:', isVisible); // Debug log
+  console.log('LoadingScreen render, isVisible:', isVisible);
 
   if (!isVisible) {
-    console.log('LoadingScreen hidden'); // Debug log
+    console.log('LoadingScreen hidden');
     return null;
   }
 

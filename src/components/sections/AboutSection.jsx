@@ -2,7 +2,8 @@ import React, { useRef } from 'react'
 import { Text } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { animated, useSpring } from '@react-spring/three'
-const AboutCard = ({ position, title, content }) => {
+
+const AboutCard = ({ position, title, content, scale = 1.2 }) => {
   const meshRef = useRef()
 
   useFrame((state) => {
@@ -48,14 +49,20 @@ const AboutCard = ({ position, title, content }) => {
   )
 }
 
-const AboutSection = ({ onClose }) => {
+const AboutSection = ({ onClose, scale = 1.2, position = [0, 0, -2] }) => {
   const groupRef = useRef()
+
+  const [springs] = useSpring(() => ({
+    from: { scale: 0, opacity: 0 },
+    to: { scale: scale, opacity: 1 },
+    config: { duration: 500 }
+  }))
 
   const cards = [
     {
       title: "Our Vision",
       content: "Fostering innovation and entrepreneurship in the next generation of leaders.",
-      position: [-4, 1, 0]
+      position: [-6, 1, 0]
     },
     {
       title: "Our Mission",
@@ -65,21 +72,19 @@ const AboutSection = ({ onClose }) => {
     {
       title: "Our Values",
       content: "Innovation, Collaboration, Excellence, and Impact.",
-      position: [4, 1, 0]
+      position: [6, 1, 0]
     }
   ]
 
   return (
-    <motion.group
+    <animated.group
       ref={groupRef}
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0, opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      position={position}
+      {...springs}
     >
       <Text
-        position={[0, 3, 0]}
-        fontSize={0.5}
+        position={[0, 4, 0]}
+        fontSize={0.7}
         color="#00B4D8"
         anchorX="center"
         anchorY="middle"
@@ -91,21 +96,22 @@ const AboutSection = ({ onClose }) => {
         <AboutCard
           key={index}
           {...card}
+          scale={1.2}
         />
       ))}
 
       <Text
-        position={[0, -2, 0]}
-        fontSize={0.2}
+        position={[0, -3, 0]}
+        fontSize={0.25}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        maxWidth={8}
+        maxWidth={10}
       >
         The Entrepreneurship Development Cell of MAIT is a student-run organization
         that aims to foster the spirit of entrepreneurship among students.
       </Text>
-    </motion.group>
+    </animated.group>
   )
 }
 

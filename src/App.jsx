@@ -11,6 +11,7 @@ import Experience from './components/Experience';
 import Navbar from './components/ui/Navbar';
 import Cursor from './components/ui/Cursor';
 import ParticleSystem from './components/effects/ParticleSystem';
+import AudioToggle from './components/ui/AudioToggle';
 
 const AppContainer = styled.div`
   width: 100vw;
@@ -38,12 +39,15 @@ function App() {
 
   const handleLoadingComplete = useCallback(() => {
     audioManager.initAudio();
+    audioManager.playSound('background');
     setScreen('experience');
   }, [audioManager]);
 
   return (
     <AppContainer>
       <Cursor onMove={setCursorPosition} />
+      <AudioToggle />
+      
       {screen === 'entry' && (
         <EntryScreen onEnter={handleEntryClick} />
       )}
@@ -52,9 +56,9 @@ function App() {
         <BSODTransition onTransitionEnd={handleBSODComplete} />
       )}
 
-        {screen === 'loading' && (
-          <LoadingScreen onEndLoading={handleLoadingComplete} />
-        )}
+      {screen === 'loading' && (
+        <LoadingScreen onEndLoading={handleLoadingComplete} />
+      )}
 
       {screen === 'experience' && (
         <>

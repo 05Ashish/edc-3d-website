@@ -5,7 +5,7 @@ const sounds = {
   background: new Howl({
     src: ['src/assets/sounds/background.mp3'],
     loop: true,
-    volume: 0.3
+    volume: 0.08
   }),
   hover: new Howl({
     src: ['/assets/sounds/hover.mp3'],
@@ -40,14 +40,20 @@ const useAudioStore = create((set, get) => ({
   },
 
   toggleMute: () => {
-    const state = get()
-    const newMutedState = !state.isMuted
+    const { isMuted } = get();
+    const newMutedState = !isMuted;
     
+    // Mute/unmute all sounds
     Object.values(sounds).forEach(sound => {
-      sound.mute(newMutedState)
-    })
+      sound.mute(newMutedState);
+    });
+
+    // If unmuting and background music should be playing, ensure it's playing
+    if (!newMutedState && get().isPlaying) {
+      sounds.background.play();
+    }
     
-    set({ isMuted: newMutedState })
+    set({ isMuted: newMutedState });
   },
 
   setMusicVolume: (volume) => {

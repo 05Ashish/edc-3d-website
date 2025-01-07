@@ -3,7 +3,7 @@ import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const ParticleSystem = ({ cursorPosition = { x: 0, y: 0, z: 0 }, count = 30000 }) => {
+const ParticleSystem = ({ cursorPosition = { x: 0, y: 0, z: 0 }, count = 50000 }) => {
   const points = useRef();
   
   // Generate initial particle positions
